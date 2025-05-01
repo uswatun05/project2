@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // Untuk encode/decode data
+import 'dart:convert'; 
 
 class TodoHomePage extends StatefulWidget {
   const TodoHomePage({super.key});
@@ -52,6 +52,29 @@ class _TodoHomePageState extends State<TodoHomePage> {
     _saveTodos();
   }
 
+  void _confirmRemove(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Tugas'),
+        content: const Text('Yakin ingin menghapus tugas ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context), // Menutup dialog
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () {
+              _removeTodo(index); // Menghapus tugas setelah konfirmasi
+              Navigator.pop(context); // Menutup dialog
+            },
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,21 +105,23 @@ class _TodoHomePageState extends State<TodoHomePage> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: _todos.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(_todos[index]),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () => _removeTodo(index),
-                      ),
+              child: _todos.isEmpty
+                  ? const Center(child: Text('Belum ada tugas.'))
+                  : ListView.builder(
+                      itemCount: _todos.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          child: ListTile(
+                            title: Text(_todos[index]),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () => _confirmRemove(index), // Panggil konfirmasi
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            )
+            ),
           ],
         ),
       ),
