@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'trash_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TodoHomePage extends StatefulWidget {
   const TodoHomePage({super.key});
@@ -47,7 +48,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
   });
     _saveTodos();
   }
-  
+
   void _addTodo() {
     final text = _controller.text;
     if (text.isNotEmpty) {
@@ -151,8 +152,13 @@ class _TodoHomePageState extends State<TodoHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.deepPurple[50],
       appBar: AppBar(
-        title: const Text('To-Do-List'),
+        backgroundColor: Colors.purple,
+        title: Text(
+          'To-Do-List',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold,fontSize: 24),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -179,21 +185,31 @@ class _TodoHomePageState extends State<TodoHomePage> {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                   backgroundColor: Colors.purple,
+                   foregroundColor: Colors.white,
+                  ),
                   onPressed: _addTodo,
                   child: const Text('Tambah'),
                 )
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Expanded(
               child: _filteredTodos.isEmpty
-                ? const Center(child: Text('Belum ada tugas'))
+                ? Center(child: Text('Belum ada tugas',style: GoogleFonts.poppins()))
                 : ListView.builder(
                     itemCount: _filteredTodos.length,
                     itemBuilder: (context, index) {
                       return Card(
                         child: ListTile(
-                          title: Text(_filteredTodos[index]),
+                          title: Text(
+                            _filteredTodos[index],
+                             style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold, 
+                            fontSize: 24
+                            ),
+                            ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -204,6 +220,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () => _editTodoDialog(index),
+                            
                               ),
                             ],
                           ),
