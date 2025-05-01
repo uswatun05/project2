@@ -152,12 +152,16 @@ class _TodoHomePageState extends State<TodoHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple[50],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blue,
+        centerTitle: true,
         title: Text(
-          'To-Do-List',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold,fontSize: 24),
+          'Catatan Harian📚',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: Colors.white)
         ),
       ),
       body: Padding(
@@ -186,7 +190,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                   backgroundColor: Colors.purple,
+                   backgroundColor: Colors.blue,
                    foregroundColor: Colors.white,
                   ),
                   onPressed: _addTodo,
@@ -202,12 +206,12 @@ class _TodoHomePageState extends State<TodoHomePage> {
                     itemCount: _filteredTodos.length,
                     itemBuilder: (context, index) {
                       return Card(
+                        color: Colors.white,
                         child: ListTile(
                           title: Text(
                             _filteredTodos[index],
                              style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.bold, 
-                            fontSize: 24
+                            fontSize: 18
                             ),
                             ),
                           trailing: Row(

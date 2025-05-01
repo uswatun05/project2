@@ -13,6 +13,7 @@ class TrashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Keranjang Sampah'),
       ),
@@ -23,6 +24,7 @@ class TrashPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final todo = deletedTodos[index];
                 return Card(
+                color: Colors.lightBlue[50],
                   child: ListTile(
                     title: Text(deletedTodos[index]),
                     trailing: IconButton(
