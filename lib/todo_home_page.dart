@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'trash_page.dart';
 
 class TodoHomePage extends StatefulWidget {
   const TodoHomePage({super.key});
@@ -10,6 +11,7 @@ class TodoHomePage extends StatefulWidget {
 }
 
 class _TodoHomePageState extends State<TodoHomePage> {
+  final List<String> _deletedTodos = [];
   final List<String> _todos = [];
   final List<String> _filteredTodos = [];
   final TextEditingController _controller = TextEditingController();
@@ -37,6 +39,15 @@ class _TodoHomePageState extends State<TodoHomePage> {
     await prefs.setString('todos', jsonEncode(_todos));
   }
 
+  void _restoreTodoFromTrash(String todo) {
+  setState(() {
+    _deletedTodos.remove(todo);
+    _todos.add(todo);
+    _onSearchChanged(_searchQuery);
+  });
+    _saveTodos();
+  }
+  
   void _addTodo() {
     final text = _controller.text;
     if (text.isNotEmpty) {
@@ -52,6 +63,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
   void _removeTodo(int index) {
     final removedText = _filteredTodos[index];
     setState(() {
+      _deletedTodos.add(removedText);
       _todos.remove(removedText);
       _onSearchChanged(_searchQuery);
     });
@@ -80,6 +92,47 @@ class _TodoHomePageState extends State<TodoHomePage> {
       ),
     );
   }
+
+  void _editTodoDialog(int index) {
+  final TextEditingController editController =
+      TextEditingController(text: _filteredTodos[index]);
+  
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Edit Tugas'),
+      content: TextField(
+        controller: editController,
+        decoration: const InputDecoration(
+          labelText: 'Ubah tugas',
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        TextButton(
+          onPressed: () {
+            final newText = editController.text;
+            if (newText.isNotEmpty) {
+              final oldText = _filteredTodos[index];
+              final realIndex = _todos.indexOf(oldText);
+              setState(() {
+                _todos[realIndex] = newText;
+                _onSearchChanged(_searchQuery);
+              });
+              _saveTodos();
+            }
+            Navigator.pop(context);
+          },
+          child: const Text('Simpan'),
+        ),
+      ],
+    ),
+  );
+}
 
   void _onSearchChanged(String query) {
     setState(() {
@@ -134,30 +187,47 @@ class _TodoHomePageState extends State<TodoHomePage> {
             const SizedBox(height: 16),
             Expanded(
               child: _filteredTodos.isEmpty
-                  ? const Center(child: Text('Belum ada tugas'))
-                  : ListView.builder(
-                      itemCount: _filteredTodos.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          child: ListTile(
-                            title: Text(_filteredTodos[index]),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () => _editTodoDialog(index),
-                                ),
-                              icon: const Icon(Icons.delete),
-                              onPressed: () => _confirmRemove(index),
-                              ],
-                            ),
+                ? const Center(child: Text('Belum ada tugas'))
+                : ListView.builder(
+                    itemCount: _filteredTodos.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                          title: Text(_filteredTodos[index]),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => _confirmRemove(index),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () => _editTodoDialog(index),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    ),
-            ),
-          ],
+                        ),
+                      );
+                    },
+                  ),
+             ),
+TextButton(
+  onPressed: () {
+    // Tampilin keranjang sampah
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TrashPage(
+          deletedTodos: _deletedTodos,
+          restoreTodo: _restoreTodoFromTrash,
+        ),
+      ),
+    );
+  },
+  child: const Text('Lihat Keranjang Sampah'),
+),
+],
         ),
       ),
     );
