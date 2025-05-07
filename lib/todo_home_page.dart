@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -156,12 +155,15 @@ class _TodoHomePageState extends State<TodoHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    bool isDark = themeNotifier.value == ThemeMode.dark;
+    final theme = Theme.of(context);
+    final textColor = theme.textTheme.bodyLarge?.color;
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: isDark ? Colors.grey[900] : Colors.blue,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+      ? Colors.grey[900]
+      : Colors.pink[200],
+
         centerTitle: true,
         title: Text(
           'Catatan Harian📚',
@@ -171,53 +173,49 @@ class _TodoHomePageState extends State<TodoHomePage> {
             color: Colors.white,
           ),
         ),
+      
         actions: [
-          IconButton(
-            icon: Icon(
-              themeNotifier.value == ThemeMode.dark
-                  ? Icons.dark_mode
-                  : Icons.light_mode,
-              color: Colors.white,
+            ValueListenableBuilder<ThemeMode>(
+              valueListenable: themeNotifier,
+              builder: (context, mode, _) => IconButton(
+                icon: Icon(
+                  mode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  themeNotifier.value =
+                      mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+                },
+              ),
             ),
-            onPressed: () {
-              setState(() {
-                themeNotifier.value = themeNotifier.value == ThemeMode.dark
-                    ? ThemeMode.light
-                    : ThemeMode.dark;
-              });
-            },
-          ),
-        ],
+          ],
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               onChanged: _onSearchChanged,
-              style: TextStyle(
-                  color: isDark ? Colors.white : Colors.black),
+              style: TextStyle(color: textColor),
               decoration: InputDecoration(
                 labelText: 'Cari Tugas',
-                labelStyle: GoogleFonts.poppins(
-                    color: isDark ? Colors.white70 : Colors.black87),
+                labelStyle: GoogleFonts.poppins(color: textColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black),
+                    style: TextStyle(color: textColor),
                     decoration: InputDecoration(
                       labelText: 'Tambahkan Tugas',
-                      labelStyle: GoogleFonts.poppins(
-                          color: isDark ? Colors.white70 : Colors.black87),
+                      labelStyle: GoogleFonts.poppins(color: textColor),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -226,8 +224,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
+                  onPressed: _addTodo,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: theme.primaryColor,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 16),
@@ -235,12 +234,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: _addTodo,
                   child: Text(
                     'Tambah',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                    ),
+                    style: GoogleFonts.poppins(color: Colors.white),
                   ),
                 ),
               ],
@@ -261,9 +257,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                       itemCount: _filteredTodos.length,
                       itemBuilder: (context, index) {
                         return Card(
-                          color: isDark
-                              ? Colors.grey[800]
-                              : Colors.grey[200],
+                          color: theme.cardColor,
                           elevation: 4,
                           margin: const EdgeInsets.symmetric(vertical: 6),
                           shape: RoundedRectangleBorder(
@@ -274,8 +268,7 @@ class _TodoHomePageState extends State<TodoHomePage> {
                               _filteredTodos[index],
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
-                                color:
-                                    isDark ? Colors.white : Colors.black,
+                                color: textColor,
                               ),
                             ),
                             trailing: Row(
@@ -283,14 +276,13 @@ class _TodoHomePageState extends State<TodoHomePage> {
                               children: [
                                 IconButton(
                                   icon: const Icon(Icons.delete),
-                                  color: isDark ? Colors.white: Colors.black,
+                                  color: textColor,
                                   onPressed: () => _confirmRemove(index),
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.edit),
-                                  color: isDark ? Colors.white: Colors.black,
-                                  onPressed: () =>
-                                      _editTodoDialog(index),
+                                  color: textColor,
+                                  onPressed: () => _editTodoDialog(index),
                                 ),
                               ],
                             ),
@@ -315,7 +307,9 @@ class _TodoHomePageState extends State<TodoHomePage> {
                 'Lihat Keranjang Sampah',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600,
-                  color: Colors.blueAccent,
+                  color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.pink
                 ),
               ),
             ),

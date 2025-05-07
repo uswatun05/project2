@@ -13,13 +13,16 @@ class TrashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color textColor = isDark ? Colors.white : Colors.black;
+    final ThemeData theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: isDark ? Colors.grey[900] : Colors.blue,
+        backgroundColor: isDark ? Colors.black : Colors.pink[200],
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           'Keranjang Sampah 🗑️',
           style: GoogleFonts.poppins(
@@ -27,7 +30,6 @@ class TrashPage extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: deletedTodos.isEmpty
           ? Center(
@@ -36,7 +38,7 @@ class TrashPage extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontStyle: FontStyle.italic,
-                  color: isDark ? Colors.white70 : Colors.black87,
+                  color: textColor.withOpacity(0.7),
                 ),
               ),
             )
@@ -45,19 +47,23 @@ class TrashPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final todo = deletedTodos[index];
                 return Card(
-                  color: isDark ? Colors.grey[800] : Colors.grey[50],
+                  color: theme.cardColor,
                   margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
                   child: ListTile(
                     title: Text(
                       todo,
                       style: GoogleFonts.poppins(
                         fontSize: 16,
-                        color: isDark ? Colors.white : Colors.black,
+                        color: textColor,
                       ),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.restore), 
-                      color: isDark ? Colors.white: Colors.black,
+                      icon: const Icon(Icons.restore),
+                      color: textColor,
                       onPressed: () {
                         restoreTodo(todo);
                         Navigator.pop(context);
